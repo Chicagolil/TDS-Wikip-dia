@@ -98,7 +98,7 @@ def lancer_programme(date_debut, date_fin, limite):
         tableau_final = tableau_final.head(limite)
     
     # Déterminer le nombre de clusters en fonction du nombre d'articles
-    n_clusters = max(3, min(len(tableau_final) // 5, 10))
+    n_clusters = max(3, min(len(tableau_final) // 4, 10))
     print(f"[DEBUG] Nombre de clusters déterminé : {n_clusters}")
     
     # Récupérer le contenu de chaque article dans la limite
