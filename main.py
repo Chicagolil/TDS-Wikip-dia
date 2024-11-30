@@ -20,7 +20,15 @@ def recuperer_articles_plus_consultes(langue, date):
         donnees = reponse.json()
         articles = donnees['items'][0]['articles']
         print(f"[DEBUG] Nombre d'articles récupérés : {len(articles)}")
-        tableau = pd.DataFrame(articles)
+
+        # Liste des articles à exclure
+        articles_a_exclure = ["Spécial:Recherche", "Main_Page", "Accueil", "Wikipedia:Accueil"]
+
+        # Filtrer les articles à exclure
+        articles_filtrés = [article for article in articles if article['article'] not in articles_a_exclure]
+        print(f"[DEBUG] Nombre d'articles après filtrage : {len(articles_filtrés)}")
+
+        tableau = pd.DataFrame(articles_filtrés)
         return tableau[['article', 'views']]  # On garde seulement les colonnes article et vues
     else:
         print(f"Erreur : {reponse.status_code}")
@@ -89,6 +97,10 @@ def lancer_programme(date_debut, date_fin, limite):
     if limite:
         tableau_final = tableau_final.head(limite)
     
+    # Déterminer le nombre de clusters en fonction du nombre d'articles
+    n_clusters = max(3, min(len(tableau_final) // 5, 10))
+    print(f"[DEBUG] Nombre de clusters déterminé : {n_clusters}")
+    
     # Récupérer le contenu de chaque article dans la limite
     print("[DEBUG] Récupération du contenu des articles sélectionnés")
     tableau_final['contenu'] = tableau_final['article'].apply(lambda titre: recuperer_contenu_article('fr', titre))
@@ -101,7 +113,7 @@ def lancer_programme(date_debut, date_fin, limite):
 
     # Clustering
     print("[DEBUG] Début du clustering des articles")
-    clusters, kmeans = clustering_kmeans(vecteurs, n_clusters=5)
+    clusters, kmeans = clustering_kmeans(vecteurs, n_clusters=n_clusters)
     tableau_final['cluster'] = clusters
     print("[DEBUG] Clustering terminé")
 
