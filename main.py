@@ -4,11 +4,13 @@ import datetime
 import argparse
 from collections import defaultdict
 from pretraitement import nettoyer_texte
-from clustering import vectoriser_articles, clustering_kmeans,afficher_themes_principaux
+from clustering import vectoriser_articles, clustering_kmeans,afficher_themes_principaux,afficher_themes_principaux_par_distance
 import tkinter as tk
 from tkinter import messagebox
 from tkcalendar import DateEntry
 from tkinter import ttk
+from radar_plot import tracer_graphes_radars
+
 
 def recuperer_articles_plus_consultes(langue, date):
     print(f"[DEBUG] Récupération des articles les plus consultés pour la date : {date}")
@@ -118,8 +120,17 @@ def lancer_programme(date_debut, date_fin, limite):
     print("[DEBUG] Clustering terminé")
 
     # Afficher les thèmes principaux de chaque cluster
-    print("[DEBUG] Affichage des thèmes principaux par cluster")
-    afficher_themes_principaux(vecteurs, clusters, vectorizer, top_n=10)
+    print("[DEBUG] Affichage des thèmes principaux par cluster (TF-IDF)")
+    themes_principaux_tfidf = afficher_themes_principaux(vecteurs, clusters, vectorizer, top_n=10)
+
+    print("[DEBUG] Affichage des thèmes principaux par cluster (Distance au centre)")
+    themes_principaux_distance = afficher_themes_principaux_par_distance(vecteurs, clusters, vectorizer, top_n=10)
+
+
+
+    # Tracer les graphiques pour les deux métriques
+    tracer_graphes_radars(themes_principaux_tfidf, themes_principaux_distance)
+
 
     # Sauvegarder les articles et leurs contenus dans un fichier JSON
     if not tableau_final.empty:
