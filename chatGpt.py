@@ -1,6 +1,4 @@
 from openai import OpenAI
-client = OpenAI(api_key = "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"
-)
 
 
 def interpreter_themes_principaux(themes_principaux):
