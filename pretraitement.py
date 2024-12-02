@@ -9,8 +9,6 @@ stop_words = set(stopwords.words("french"))
 
 def nettoyer_texte(texte):
     texte = re.sub(r"\b\w['’]", '', texte)
-    # Transformer les caractères accentués en leur version non accentuée
-    texte = unidecode(texte)
     
 
     # Retirer les caractères spéciaux, les chiffres, et passer en minuscules

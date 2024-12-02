@@ -4,13 +4,13 @@ import datetime
 import argparse
 from collections import defaultdict
 from pretraitement import nettoyer_texte
-from clustering import vectoriser_articles, clustering_kmeans,afficher_themes_principaux,afficher_themes_principaux_par_distance
+from clustering import vectoriser_articles, clustering_kmeans,afficher_themes_principaux
 import tkinter as tk
 from tkinter import messagebox
 from tkcalendar import DateEntry
 from tkinter import ttk
-from radar_plot import tracer_graphes_radars
-
+from radar_plot import afficher_fenetres_clusters_interpretations
+from chatGpt import interpreter_themes_principaux
 
 def recuperer_articles_plus_consultes(langue, date):
     print(f"[DEBUG] Récupération des articles les plus consultés pour la date : {date}")
@@ -24,7 +24,7 @@ def recuperer_articles_plus_consultes(langue, date):
         print(f"[DEBUG] Nombre d'articles récupérés : {len(articles)}")
 
         # Liste des articles à exclure
-        articles_a_exclure = ["Spécial:Recherche", "Main_Page", "Accueil", "Wikipedia:Accueil"]
+        articles_a_exclure = ["Fichier:XNXX_logo.png","Fichier:France_relief_location_map.jpg","wiki.phtml","Fichier:Cleopatra_poster.jpg","Spécial:Recherche", "Main_Page", "Accueil", "Wikipedia:Accueil","Wikipédia:Accueil_principal"]
 
         # Filtrer les articles à exclure
         articles_filtrés = [article for article in articles if article['article'] not in articles_a_exclure]
@@ -123,13 +123,15 @@ def lancer_programme(date_debut, date_fin, limite):
     print("[DEBUG] Affichage des thèmes principaux par cluster (TF-IDF)")
     themes_principaux_tfidf = afficher_themes_principaux(vecteurs, clusters, vectorizer, top_n=10)
 
-    print("[DEBUG] Affichage des thèmes principaux par cluster (Distance au centre)")
-    themes_principaux_distance = afficher_themes_principaux_par_distance(vecteurs, clusters, vectorizer, top_n=10)
+    print("[DEBUG] Envoi des thèmes principaux à ChatGPT pour interprétation")
+    interpretations = interpreter_themes_principaux(themes_principaux_tfidf)
 
-
+    # Afficher les interprétations
+    for interpretation in interpretations:
+        print(interpretation)
 
     # Tracer les graphiques pour les deux métriques
-    tracer_graphes_radars(themes_principaux_tfidf, themes_principaux_distance)
+    afficher_fenetres_clusters_interpretations(themes_principaux_tfidf,interpretations)
 
 
     # Sauvegarder les articles et leurs contenus dans un fichier JSON
@@ -161,7 +163,7 @@ def interface_graphique():
     # Créer la fenêtre principale
     fenetre = tk.Tk()
     fenetre.title("Paramètres de récupération des articles Wikipédia")
-    fenetre.geometry("400x350")
+    fenetre.geometry("600x350")
     fenetre.configure(bg='#ffffff')
 
     style = ttk.Style()

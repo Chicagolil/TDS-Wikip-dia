@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import matplotlib.pyplot as plt
 
 # Vecteurisation des articles avec TF-IDF
-def vectoriser_articles(contenus, max_features=1000):
+def vectoriser_articles(contenus, max_features=5000):
     vectorizer = TfidfVectorizer(max_features=max_features)
     vecteurs = vectorizer.fit_transform(contenus)
     return vecteurs, vectorizer
@@ -57,36 +57,3 @@ def afficher_themes_principaux(vecteurs, clusters, vectorizer, top_n=10):
     
     return themes_principaux
 
-def afficher_themes_principaux_par_distance(vecteurs, clusters, vectorizer, top_n=10):
-    """
-    Retourne les thèmes principaux de chaque cluster en se basant sur la distance au centre du cluster.
-
-    :param vecteurs: Matrice TF-IDF.
-    :param clusters: Numpy array des identifiants de clusters.
-    :param vectorizer: Modèle TF-IDF vectorizer.
-    :param top_n: Nombre de termes principaux à extraire.
-    :return: Liste de listes, chaque sous-liste contient des tuples (mot, distance) pour chaque cluster.
-    """
-    termes = vectorizer.get_feature_names_out()
-    themes_principaux = []
-
-    for cluster in np.unique(clusters):
-        print(f"\n[DEBUG] Thèmes principaux pour le cluster {cluster} (par distance au centre) :")
-        
-        indices_cluster = np.where(clusters == cluster)[0]
-        vecteurs_cluster = vecteurs[indices_cluster]
-        
-        # Calculer le centre du cluster
-        centre_cluster = vecteurs_cluster.mean(axis=0).A1
-        
-        # Calculer la distance de chaque mot par rapport au centre
-        distances = np.abs(centre_cluster)
-        
-        # Sélectionner les mots les plus proches du centre
-        indices_top_termes = distances.argsort()[::-1][:top_n]
-        top_termes = [(termes[i], distances[i]) for i in indices_top_termes]
-        
-        themes_principaux.append(top_termes)
-        print(", ".join([terme for terme, _ in top_termes]))
-
-    return themes_principaux
