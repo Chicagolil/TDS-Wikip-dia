@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-
+client = OpenAI(api_key = "")
 def interpreter_themes_principaux(themes_principaux):
     """
     Utilise l'API ChatGPT pour interpréter les thèmes principaux de chaque cluster.
